@@ -29,4 +29,4 @@ services:
       - media_volume:/app/media
       - ../docs/:/usr/share/nginx/html/api/docs/
     ports:
-      - 8080:80
+      - 8000:80
