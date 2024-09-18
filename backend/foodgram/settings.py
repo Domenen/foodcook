@@ -5,7 +5,7 @@ from pathlib import Path
 
 load_dotenv()
 
-SECRET_KEY = os.getenv('SECRET_KEY', default='token')
+SECRET_KEY = os.getenv('SECRET_KEY') or 'for_test'
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
