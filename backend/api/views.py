@@ -11,11 +11,11 @@ from rest_framework.views import APIView
 from .permissions import IsAdminAuthorOrReadOnly
 from .paginations import FoodgramPagination
 from .serializers import (AvatarSerializer, FavoriteSerializer,
-                          RecipeCreateSerializer, RecipeGetSerializer, 
+                          RecipeCreateSerializer, RecipeGetSerializer,
                           ShoppingCartSerializer, IngredientSerializer,
                           TagSerialiser, UserSubscribeRepresentSerializer,
                           UserSubscribeSerializer)
-from .utils import (IngredientFilter, RecipeFilter, 
+from .utils import (IngredientFilter, RecipeFilter,
                     create_model_recipe, delete_model_recipe)
 from recipes.models import (Favorite, Ingredient, Recipe,
                             RecipeIngredient, ShoppingCart, Tag)
@@ -142,8 +142,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         if request.method == 'DELETE':
             error_msg = 'Нет этого рецепта в избранном'
-            return delete_model_recipe(request, Favorite,
-                                         recipe, error_msg)
+            return delete_model_recipe(
+                request, Favorite,
+                recipe, error_msg
+            )
         return None
 
     @action(
@@ -154,13 +156,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def shopping_cart(self, request, pk):
         recipe = get_object_or_404(Recipe, id=pk)
         if request.method == 'POST':
-            return create_model_recipe(request, recipe,
-                                         ShoppingCartSerializer)
+            return create_model_recipe(
+                request, recipe,
+                ShoppingCartSerializer
+            )
 
         if request.method == 'DELETE':
             error_msg = 'Нет этого рецепта в списке покупок'
-            return delete_model_recipe(request, ShoppingCart,
-                                         recipe, error_msg)
+            return delete_model_recipe(
+                request, ShoppingCart,
+                recipe, error_msg
+            )
         return None
 
     @action(
