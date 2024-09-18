@@ -141,4 +141,6 @@ dmypy.json
 static/
 media/
 
-.dockerignore
+node_modules
+
+docker-compose.yml
