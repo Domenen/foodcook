@@ -5,6 +5,4 @@ COPY package*.json ./
 RUN npm install
 COPY . ./
 RUN npm run build
-RUN npm install --global http-server
-
 CMD cp -r build result_build
