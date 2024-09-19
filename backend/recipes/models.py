@@ -116,6 +116,13 @@ class RecipeIngredient(models.Model):
         ]
     )
 
+    class Meta:
+        verbose_name = 'Ингредиент в рецепте'
+        verbose_name_plural = 'Ингредиенты в рецептах'
+
+    def __str__(self):
+        return self.name
+
 
 class Favorite(models.Model):
     user = models.ForeignKey(
