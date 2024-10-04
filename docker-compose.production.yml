@@ -25,8 +25,9 @@ services:
     image: domenen/foodgram_gateway
     env_file: .env
     volumes:
-      - ../docs/:/usr/share/nginx/html/api/docs/
       - static_volume:/static
       - media_volume:/app/media
+      - ../frontend/build:/usr/share/nginx/html/
+      - ../docs/:/usr/share/nginx/html/api/docs/
     ports:
       - 8000:80
