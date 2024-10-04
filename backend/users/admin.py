@@ -20,13 +20,6 @@ class SubscriptionAdmin(admin.ModelAdmin):
     list_filter = ('user', 'author')
     search_fields = ('user', 'author')
 
-    def validate(self, data):
-        if data['user'] == data['author']:
-            raise serializers.ValidationError(
-                'Нельзя подписаться на себя'
-            )
-        return data
-
 
 admin.site.unregister(Group)
 admin.site.unregister(TokenProxy)
