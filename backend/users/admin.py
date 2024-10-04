@@ -22,11 +22,3 @@ class SubscriptionAdmin(admin.BaseModelAdmin):
 
 admin.site.unregister(Group)
 admin.site.unregister(TokenProxy)
-
-    # def save_form(self, request, form, change):
-    #     if form.user == form.author:
-    #         form.author = None
-    #         return super().save_form(
-    #             self, request, form=None, change=change
-    #         )
-    #     return super().save_form(self, request, form, change)
