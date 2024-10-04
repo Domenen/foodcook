@@ -23,7 +23,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
     def save_form(self, request, form, formset, change):
         if form.user == form.author:
             return super().save_form(
-                request, form, formset=None, change=change
+                request, form=None, formset=None, change=change
             )
         return super().save_form(request, form, formset, change)
 
