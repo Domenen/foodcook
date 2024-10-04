@@ -19,12 +19,12 @@ class SubscriptionAdmin(admin.ModelAdmin):
     list_filter = ('user', 'author')
     search_fields = ('user', 'author')
 
-    def save_form(self, request, form, formset, change):
+    def save_form(self, request, form, change):
         if form.user == form.author:
             return super().save_form(
-                request, form=None, formset=None, change=change
+                self, request, form=None, change=change
             )
-        return super().save_form(request, form, formset, change)
+        return super().save_form(self, request, form, change)
 
 
 admin.site.unregister(Group)
