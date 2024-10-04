@@ -21,6 +21,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
 
     def save_form(self, request, form, change):
         if form.user == form.author:
+            form.author = None
             return super().save_form(
                 self, request, form=None, change=change
             )
