@@ -22,6 +22,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
 
     def save_form(self, request, form, formset, change):
         if form.user == form.author:
+            formset.save(commit=False)
             raise serializers.ValidationError(
                 'Нельзя подписать пользователя на самого себя'
             )
