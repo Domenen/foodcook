@@ -22,12 +22,10 @@ class SubscriptionAdmin(admin.ModelAdmin):
 
     def save_form(self, request, form, formset, change):
         if form.user == form.author:
-            formset.save(commit=False)
-            raise serializers.ValidationError(
-                'Нельзя подписать пользователя на самого себя'
+            return super().save_form(
+                request, form, formset=None, change=change
             )
-        else:
-            return super().save_form(request, form, formset, change)
+        return super().save_form(request, form, formset, change)
 
 
 admin.site.unregister(Group)
