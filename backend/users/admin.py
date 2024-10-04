@@ -20,7 +20,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
     search_fields = ('user', 'author')
 
     def save_formset(self, request, form, formset, change):
-        if formset.user == formset.author:
+        if form.user == form.author:
             return formset.save(commit=False)
         else:
             return super().save_formset(request, form, formset, change)
