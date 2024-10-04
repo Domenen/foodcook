@@ -4,6 +4,7 @@ from rest_framework.authtoken.models import TokenProxy
 
 from .models import User, Subscription
 
+
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = ('pk', 'email', 'username', 'first_name',
