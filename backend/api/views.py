@@ -1,8 +1,8 @@
 from django.db.models import Sum
 from django_filters.rest_framework import DjangoFilterBackend
-from django.shortcuts import HttpResponse, get_object_or_404, redirect
+from django.shortcuts import HttpResponse, get_object_or_404
 from djoser.views import UserViewSet
-from rest_framework import mixins, status, viewsets, permissions
+from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -211,10 +211,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ShortLinkViewSet(viewsets.ViewSet):
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+class GetLinkViewSet(APIView):
+    queryset = Recipe.objects.all()
+    permission_classes = (AllowAny,)
+    http_method_names = ['get']
 
-    def redirect_short_link(self, request, short_id=None):
-        recipe = get_object_or_404(Recipe, short_id=short_id)
-        recipe_detail_url = f'/recipes/{recipe.id}/'
-        return redirect(recipe_detail_url)
+    @action(
+        detail=False, methods=["GET"],
+        permission_classes=(AllowAny, )
+    )
+    def get(self, request, pk):
+        link = request.build_absolute_uri()
+        link_str = link.replace('/api', '')
+        link_str = link_str.replace('/get-link/', '')
+        data = {"short-link": link_str}
+        return Response(data)
