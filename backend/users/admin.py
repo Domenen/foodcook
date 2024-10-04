@@ -6,7 +6,7 @@ from .models import User, Subscription
 
 
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
+class UserAdmin(admin.BaseModelAdmin):
     list_display = ('pk', 'email', 'username', 'first_name',
                     'last_name', 'password')
     list_filter = ('username', 'email')
