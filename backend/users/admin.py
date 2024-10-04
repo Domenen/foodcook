@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
-from django.db import models
+from django.forms import BaseModelFormSet, ModelForm
+from django.http import HttpRequest
 from rest_framework.authtoken.models import TokenProxy
 
 from .models import User, Subscription
@@ -20,17 +21,11 @@ class SubscriptionAdmin(admin.ModelAdmin):
     list_filter = ('user', 'author')
     search_fields = ('user', 'author')
 
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['user', 'author'],
-                name='unique_user_author'
-            ),
-            models.CheckConstraint(
-                check=~models.Q(user=models.F('subscribed_to')),
-                name='prevent_self_subscription'
-            )
-        ]
+    def save_formset(self, request: HttpRequest, form: ModelForm, formset: BaseModelFormSet, change: bool) -> None:
+        if formset.user == formset.author:
+            return formset.save(commit=False)
+        else: 
+            return super().save_formset(request, form, formset, change)
 
 
 admin.site.unregister(Group)
