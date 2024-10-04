@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
-from django.db import models
+from rest_framework import serializers
 from rest_framework.authtoken.models import TokenProxy
 
 from .models import User, Subscription
@@ -20,17 +20,12 @@ class SubscriptionAdmin(admin.ModelAdmin):
     list_filter = ('user', 'author')
     search_fields = ('user', 'author')
 
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['user', 'author'],
-                name='unique_user_author'
-            ),
-            models.CheckConstraint(
-                check=~models.Q(user=models.F('author')),
-                name='prevent_self_subscription'
+    def validate(self, data):
+        if data['user'] == data['author']:
+            raise serializers.ValidationError(
+                'Нельзя подписаться на себя'
             )
-        ]
+        return data
 
 
 admin.site.unregister(Group)
