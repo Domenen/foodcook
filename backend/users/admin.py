@@ -1,7 +1,5 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
-from django.forms import BaseModelFormSet, ModelForm
-from django.http import HttpRequest
 from rest_framework.authtoken.models import TokenProxy
 
 from .models import User, Subscription
@@ -21,10 +19,10 @@ class SubscriptionAdmin(admin.ModelAdmin):
     list_filter = ('user', 'author')
     search_fields = ('user', 'author')
 
-    def save_formset(self, request: HttpRequest, form: ModelForm, formset: BaseModelFormSet, change: bool) -> None:
+    def save_formset(self, request, form, formset, change):
         if formset.user == formset.author:
             return formset.save(commit=False)
-        else: 
+        else:
             return super().save_formset(request, form, formset, change)
 
 
