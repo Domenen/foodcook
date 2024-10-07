@@ -222,7 +222,7 @@ class GetLinkViewSet(APIView):
     )
     def get(self, request, pk):
         link = request.build_absolute_uri()
-        link_str = link.replace('/api/recipes', 's')
+        link_str = link.replace('/api/recipes', '/s')
         link_str = link_str.replace('/get-link/', '')
         data = {"short-link": link_str}
         return Response(data)
