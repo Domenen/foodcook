@@ -84,6 +84,9 @@ class Recipe(models.Model):
             )
         ]
     )
+    favorites_amount = models.PositiveSmallIntegerField(
+        'кол-во в избранном',
+    )
     short_url = models.CharField(
         max_length=LENGTH_SHORT_URL,
         unique=True,
