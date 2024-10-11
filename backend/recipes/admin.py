@@ -40,7 +40,7 @@ class RecipeAdmin(admin.ModelAdmin):
             None,
             {'fields': (
                 'author',
-                ('recipe__name', 'cooking_time'),
+                ('name', 'cooking_time'),
                 'text',
                 'image',
                 'tags',
