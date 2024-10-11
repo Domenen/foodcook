@@ -6,7 +6,7 @@ from users.models import User
 
 MAX_LENGTH = 200
 MIN_VALUE = 1
-LENGTH_SHORT_URL = 5
+LENGTH_SHORT_URL = 10
 
 
 class Tag(models.Model):
@@ -103,7 +103,7 @@ class Recipe(models.Model):
 
     def generate_short_url(self):
         while True:
-            short_url = get_random_string(length=10)
+            short_url = get_random_string(length=LENGTH_SHORT_URL)
             if not Recipe.objects.filter(short_url=short_url).exists():
                 return short_url
 
