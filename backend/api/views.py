@@ -1,6 +1,6 @@
 from django.db.models import Sum
 from django_filters.rest_framework import DjangoFilterBackend
-from django.shortcuts import HttpResponse, get_object_or_404
+from django.shortcuts import HttpResponse, get_object_or_404, redirect
 from djoser.views import UserViewSet
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
@@ -211,18 +211,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class GetLinkViewSet(APIView):
-    queryset = Recipe.objects.all()
-    permission_classes = (AllowAny,)
-    http_method_names = ['get']
-
-    @action(
-        detail=False, methods=["GET"],
-        permission_classes=(AllowAny, )
-    )
-    def get(self, request, pk):
-        link = request.build_absolute_uri()
-        link_str = link.replace('/api/recipes', '/s')
-        link_str = link_str.replace('/get-link/', '')
-        data = {"short-link": link_str}
-        return Response(data)
+def redirect_to_recipe(request, short_url):
+    recipe = get_object_or_404(Recipe, short_url=short_url)
+    return redirect(f'/recipes/{recipe.id}')

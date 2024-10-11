@@ -1,10 +1,12 @@
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils.crypto import get_random_string
 
 from users.models import User
 
 MAX_LENGTH = 200
 MIN_VALUE = 1
+LENGTH_SHORT_URL = 5
 
 
 class Tag(models.Model):
@@ -82,6 +84,13 @@ class Recipe(models.Model):
             )
         ]
     )
+    short_url = models.CharField(
+        max_length=LENGTH_SHORT_URL,
+        unique=True,
+        blank=True,
+        null=True,
+        verbose_name='Короткая ссылка'
+    )
 
     class Meta:
         ordering = ['-id']
@@ -90,6 +99,17 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.name
+
+    def generate_short_url(self):
+        while True:
+            short_url = get_random_string(length=10)
+            if not Recipe.objects.filter(short_url=short_url).exists():
+                return short_url
+
+    def save(self, *args, **kwargs):
+        if not self.short_url:
+            self.short_url = self.generate_short_url()
+        super().save(*args, **kwargs)
 
 
 class RecipeIngredient(models.Model):

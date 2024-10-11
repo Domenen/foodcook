@@ -29,28 +29,17 @@ class RecipeIngredientInline(admin.TabularInline):
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name', 'author', 'favorites_amount')
+    readonly_fields = ('favorite_count',)
     search_fields = ('name', 'author')
     list_filter = ('name', 'author', 'tags')
     inlines = [
         RecipeIngredientInline,
     ]
 
-    fieldsets = (
-        (
-            None,
-            {'fields': (
-                'author',
-                ('name', 'cooking_time'),
-                'text',
-                'image',
-                'tags',
-            )
-            },
-        ),
-    )
-
     def favorites_amount(self, obj):
         return obj.favorites.count()
+
+    favorites_amount.short_description = 'Кол-во в избранном'
 
 
 @admin.register(RecipeIngredient)
