@@ -100,7 +100,7 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.name
-    
+
     def generate_short_url(self):
         while True:
             short_url = get_random_string(length=10)
