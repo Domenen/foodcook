@@ -3,7 +3,8 @@ from rest_framework.routers import DefaultRouter
 
 from .views import (IngredientViewSet, RecipeViewSet, TagViewSet,
                     UserSubscribeView, UserSubscriptionsViewSet,
-                    redirect_to_recipe, CustomUserViewSet)
+                    GetLinkViewSet, redirect_to_recipe,
+                    CustomUserViewSet)
 
 
 router = DefaultRouter()
@@ -19,5 +20,6 @@ urlpatterns = [
          UserSubscriptionsViewSet.as_view({"get": "list"})),
     path("users/<int:user_id>/subscribe/", UserSubscribeView.as_view()),
     path("s/<short_url>", redirect_to_recipe, name='redirect_full_url'),
+    path("recipes/<int:pk>/get-link/", GetLinkViewSet.as_view()),
     path("", include(router.urls)),
 ]
