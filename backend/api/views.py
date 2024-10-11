@@ -1,7 +1,6 @@
 from django.db.models import Sum
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import HttpResponse, get_object_or_404, redirect
-from django.utils.crypto import get_random_string
 from djoser.views import UserViewSet
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
