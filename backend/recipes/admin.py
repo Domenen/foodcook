@@ -52,7 +52,7 @@ class RecipeAdmin(admin.ModelAdmin):
     def favorites_amount(self, obj):
         return obj.favorites.count()
 
-    favorites_amount.__name__='Кол-во в избранном'
+    favorites_amount.__name__ = 'Кол-во в избранном'
 
 
 @admin.register(RecipeIngredient)
