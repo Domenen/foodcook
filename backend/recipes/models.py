@@ -122,7 +122,7 @@ class RecipeIngredient(models.Model):
         verbose_name_plural = 'Ингредиенты в рецептах'
 
     def __str__(self):
-        return self.ingredient
+        return self.ingredient.name
 
 
 class Favorite(models.Model):
