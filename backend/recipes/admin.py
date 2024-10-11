@@ -40,7 +40,7 @@ class RecipeAdmin(admin.ModelAdmin):
             None,
             {'fields': (
                 'author',
-                ('name', 'cooking_time'),
+                ('recipe__name', 'cooking_time'),
                 'text',
                 'image',
                 'tags',
@@ -51,6 +51,7 @@ class RecipeAdmin(admin.ModelAdmin):
 
     def favorites_amount(self, obj):
         return obj.favorites.count()
+    favorites_amount.short_description = 'Кол-во в избранном'
 
 
 @admin.register(RecipeIngredient)
