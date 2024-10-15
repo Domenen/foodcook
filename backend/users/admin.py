@@ -1,7 +1,9 @@
+from django.core.exceptions import ValidationError
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 from django.contrib.auth.models import Group
-from django.db import models
+from django.forms import ModelForm
+from django.http import HttpRequest
 from rest_framework.authtoken.models import TokenProxy
 
 from .models import User, Subscription
@@ -21,13 +23,10 @@ class SubscriptionAdmin(admin.ModelAdmin):
     list_filter = ('user', 'author')
     search_fields = ('user', 'author')
 
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['user', 'author'],
-                name='unique_user_author'
-            )
-        ]
+    def save_model(self, request, obj, form, change):
+        if obj.user == obj.author:
+            raise ValidationError('Нельзя подписать пользователя на самого себя!')
+        return super().save_model(request, obj, form, change)
 
 
 admin.site.unregister(Group)

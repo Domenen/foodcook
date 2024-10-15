@@ -1,40 +1,35 @@
 import csv
+from pathlib import Path
 
 from django.core.management.base import BaseCommand
 
-from ..recipes.models import Ingredient
+from ...models import Ingredient
+from foodgram.settings import FILE_PATH_INGREDIENTS
 
 
 class Command(BaseCommand):
-    help = 'Loads ingredients from a CSV file'
-
-    def add_arguments(self, parser):
-        parser.add_argument('csv_file',
-                            type=str,
-                            help='The path to the CSV file'
-                            )
 
     def handle(self, *args, **kwargs):
-        csv_file = kwargs['csv_file']
+        csv_file = Path(FILE_PATH_INGREDIENTS / 'ingredients.csv')
 
         with open(csv_file, 'r', encoding='utf-8') as file:
             reader = csv.reader(file)
             for row in reader:
                 if len(row) == 2:
-                    name, unit = row
+                    name, measurement_unit = row
                     name = name.strip()
-                    unit = unit.strip()
+                    measurement_unit = measurement_unit.strip()
 
                     ingredient, created = Ingredient.objects.get_or_create(
-                        name=name, unit=unit
+                        name=name, measurement_unit=measurement_unit
                     )
                     if created:
                         self.stdout.write(self.style.SUCCESS(
-                            f"Added: {name} ({unit})")
+                            f"Added: {name} ({measurement_unit})")
                         )
                     else:
                         self.stdout.write(self.style.WARNING(
-                            f"Skipped (already exists): {name} ({unit})")
+                            f"Skipped (already exists): {name} ({measurement_unit})")
                         )
                 else:
                     self.stdout.write(self.style.ERROR(
