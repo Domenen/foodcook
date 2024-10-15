@@ -22,11 +22,10 @@ class SubscriptionAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         if obj.user == obj.author:
-            messages.add_message(
+            return messages.add_message(
                 request, messages.WARNING,
                 'Нельзя подписать пользователя на самого себя!'
             )
-            return None
         return super().save_model(request, obj, form, change)
 
 
