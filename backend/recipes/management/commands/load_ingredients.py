@@ -29,7 +29,7 @@ class Command(BaseCommand):
                         )
                     else:
                         self.stdout.write(self.style.WARNING(
-                            f"Skipped (already exists): {name} ({measurement_unit})")
+                            f"Skipped: {name} ({measurement_unit})")
                         )
                 else:
                     self.stdout.write(self.style.ERROR(
