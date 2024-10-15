@@ -26,7 +26,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 request, messages.WARNING,
                 'Нельзя подписать пользователя на самого себя!'
             )
-            obj = None
+            return None
         return super().save_model(request, obj, form, change)
 
 
