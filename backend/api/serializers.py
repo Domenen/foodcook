@@ -93,10 +93,7 @@ class UserSubscribeSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         request = self.context.get('request')
-        if (
-            request.user == data['author']
-            or data['user'] == data['author']
-        ):
+        if request.user == data['author']:
             raise serializers.ValidationError(
                 'Нельзя подписаться на себя'
             )
