@@ -11,7 +11,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         csv_file = Path(FILE_PATH_INGREDIENTS / 'ingredients.csv')
-        try:
+        if csv_file.exists():
 
             with open(csv_file, 'r', encoding='utf-8') as file:
                 reader = csv.reader(file)
@@ -23,8 +23,7 @@ class Command(BaseCommand):
                         objs=[Ingredient(
                             name=name,
                             measurement_unit=measurement_unit
-                        )
-                        for name in row],
+                        )for name in row],
                         ignore_conflicts=True
                     )
                     if created:
@@ -39,11 +38,8 @@ class Command(BaseCommand):
                     else:
                         self.stdout.write(self.style.ERROR(
                             f'Проблемы с форматом: {row}, {measurement_unit}'
-                            )
-                        )
-        except:
+                        ))
+        else:
             self.stdout.write(self.style.ERROR(
-                f'На пути {FILE_PATH_INGREDIENTS}\ingredients.csv \
-                    файл не найден'
-                )
-            )
+                f'Не найден {FILE_PATH_INGREDIENTS}/ingredients.csv'
+            ))
