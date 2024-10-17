@@ -15,8 +15,8 @@ from .serializers import (AvatarSerializer, FavoriteSerializer,
                           ShoppingCartSerializer, IngredientSerializer,
                           TagSerialiser, UserSubscribeRepresentSerializer,
                           UserSubscribeSerializer)
-from .utils import (IngredientFilter, RecipeFilter,
-                    create_model_recipe, delete_model_recipe)
+from .utils import create_model_recipe, delete_model_recipe
+from .filters import IngredientFilter, RecipeFilter
 from recipes.models import (Favorite, Ingredient, Recipe,
                             RecipeIngredient, ShoppingCart, Tag)
 from users.models import Subscription, User
