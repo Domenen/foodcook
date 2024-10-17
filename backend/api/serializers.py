@@ -66,13 +66,16 @@ class UserSubscribeRepresentSerializer(UserGetSerializer):
 
     def get_recipes(self, obj):
         request = self.context.get['request']
-        recipes_limit = request.query_params.get('recipes_limit')
+        recipes_limit = None
+        if request:
+            recipes_limit = request.query_params.get('recipes_limit')
         recipes = obj.recipes.all()
         if recipes_limit:
-            recipes = obj.recipes.all()[:int(recipes_limit)]
+            save_recipes_limit = int(recipes_limit)
+            recipes = recipes[:save_recipes_limit]
         return RecipeSmallSerializer(
             recipes, many=True,
-            context={'request': request}
+            context=self.context
         ).data
 
 
@@ -97,9 +100,8 @@ class UserSubscribeSerializer(serializers.ModelSerializer):
         return data
 
     def to_representation(self, instance):
-        request = self.context.get('request')
         return UserSubscribeRepresentSerializer(
-            instance.author, context={'request': request}
+            instance.author, context=self.context
         ).data
 
 
@@ -267,10 +269,9 @@ class FavoriteSerializer(serializers.ModelSerializer):
         ]
 
     def to_representation(self, instance):
-        request = self.context.get('request')
         return RecipeSmallSerializer(
             instance.recipe,
-            context={'request': request}
+            context=self.context
         ).data
 
 
@@ -287,8 +288,7 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
         ]
 
     def to_representation(self, instance):
-        request = self.context.get('request')
         return RecipeSmallSerializer(
             instance.recipe,
-            context={'request': request}
+            context=self.context
         ).data
