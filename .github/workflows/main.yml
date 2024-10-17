@@ -166,3 +166,30 @@ jobs:
         to: ${{ secrets.TELEGRAM_TO }}
         token: ${{ secrets.TELEGRAM_TOKEN }}
         message: Новый деплой от ${{ github.actor }}, коммит - ${{ github.event.commits[0].message }}
+
+  del_old_image:
+    if: github.ref_name == 'main'
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+    - name: Executing remote ssh commands to deploy
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        key: ${{ secrets.SSH_KEY }}
+        passphrase: ${{ secrets.SSH_PASSPHRASE }}
+        script: |
+          sudo docker rmi $(sudo docker images -f dangling=true -q)
+  
+  send_message_when_del_old_image:
+    if: github.ref_name == 'main'
+    runs-on: ubuntu-latest
+    needs: del_old_image
+    steps:
+    - name: Send message
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ secrets.TELEGRAM_TO }}
+        token: ${{ secrets.TELEGRAM_TOKEN }}
+        message: Старые образы удалены
