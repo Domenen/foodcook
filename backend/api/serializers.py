@@ -192,9 +192,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(), many=True
     )
-    ingredients = IngredientPostSerializer(
-        many=True, source='recipe_ingredients'
-    )
+    ingredients = IngredientPostSerializer(many=True)
     image = Base64ImageField()
 
     class Meta:
@@ -206,7 +204,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         )
 
     def validate_image(self, image_data):
-        if image_data is None:
+        if not image_data:
             raise serializers.ValidationError(
                 'Нужно изображение блюда'
             )
@@ -215,23 +213,32 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     def validate(self, data):
         tags = data.get('tags', [])
         if len(tags) == 0:
-            raise serializers.ValidationError('Нужен тэг')
+            raise serializers.ValidationError(
+                _('Нужен тэг: %(value)s'),
+                params={'value': tags}
+            )
 
         if len(set(tags)) != len(tags):
-            raise serializers.ValidationError('Нужен уникальный тэг')
+            raise serializers.ValidationError(
+                _('Нужен уникальный тэг: %(value)s'),
+                params={'value': tags}
+            )
 
         ingredients = data.get('recipe_ingredients', [])
-        if len(ingredients) == 0:
-            raise serializers.ValidationError('Нужен минимум 1 ингридиент')
+        if not ingredients:
+            raise serializers.ValidationError(
+                _('Нужен минимум 1 ингридиент: %(value)s'),
+                params={'value': ingredients}
+            )
 
         id_ingredients = {
             ingredient['ingredient'] for ingredient in ingredients
         }
         if len(ingredients) != len(id_ingredients):
             raise serializers.ValidationError(
-                'Ингредиенты должны быть уникальными'
+                _('Ингредиенты должны быть уникальными: %(value)s'),
+                params={'value': ingredients}
             )
-
         return data
 
     def create(self, validated_data):
