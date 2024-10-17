@@ -101,15 +101,15 @@ class Recipe(models.Model):
     def __str__(self):
         return self.name
 
-    def generate_short_url(self):
+    def generate_url_slug(self):
         while True:
-            short_url = get_random_string(length=LENGTH_SHORT_URL)
-            if not Recipe.objects.filter(short_url=short_url).exists():
-                return short_url
+            url_slug = get_random_string(length=LENGTH_SHORT_URL)
+            if not Recipe.objects.filter(url_slug=url_slug).exists():
+                return url_slug
 
     def save(self, *args, **kwargs):
-        if not self.short_url:
-            self.short_url = self.generate_short_url()
+        if not self.url_slug:
+            self.url_slug = self.generate_url_slug()
         super().save(*args, **kwargs)
 
 
