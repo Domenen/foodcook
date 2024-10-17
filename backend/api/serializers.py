@@ -8,6 +8,8 @@ from recipes.models import (Favorite, Ingredient,
                             Recipe, RecipeIngredient,
                             ShoppingCart, Tag)
 from users.models import User, Subscription
+from .contants import (MIN_VALUE_INGREDIENTS,
+                       MAX_VALUE_INGREDIENTS)
 
 
 class UserGetSerializer(UserSerializer):
@@ -20,7 +22,7 @@ class UserGetSerializer(UserSerializer):
         )
 
     def get_is_subscribed(self, obj):
-        request = self.context.get('request')
+        request = self.context['request']
         return (
             request
             and request.user.is_authenticated
@@ -81,13 +83,13 @@ class UserSubscribeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscription
         fields = '__all__'
-        validators = [
+        validators = (
             UniqueTogetherValidator(
                 queryset=Subscription.objects.all(),
                 fields=('user', 'author'),
                 message='Уже подписаны на этого пользователя'
-            )
-        ]
+            ),
+        )
 
     def validate(self, data):
         request = self.context.get('request')
@@ -116,8 +118,12 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class IngredientGetSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(source='ingredient.id', read_only=True)
-    name = serializers.CharField(source='ingredient.name', read_only=True)
+    id = serializers.IntegerField(
+        source='ingredient.id', read_only=True
+    )
+    name = serializers.CharField(
+        source='ingredient.name', read_only=True
+    )
     measurement_unit = serializers.CharField(
         source='ingredient.measurement_unit',
 
@@ -130,7 +136,11 @@ class IngredientGetSerializer(serializers.ModelSerializer):
 
 class IngredientPostSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(
-        queryset=Ingredient.objects.all(), source='ingredient'
+        queryset=Ingredient.objects.all()
+    )
+    amount = serializers.IntegerField(
+        max_value=MAX_VALUE_INGREDIENTS,
+        min_value=MIN_VALUE_INGREDIENTS
     )
 
     class Meta:
@@ -141,33 +151,41 @@ class IngredientPostSerializer(serializers.ModelSerializer):
 class RecipeGetSerializer(serializers.ModelSerializer):
     tags = TagSerialiser(many=True, read_only=True)
     author = UserGetSerializer(read_only=True)
-    ingredients = IngredientGetSerializer(many=True, read_only=True,
-                                          source='recipeingredients')
+    ingredients = IngredientGetSerializer(
+        many=True, read_only=True,
+        source='recipeingredients'
+    )
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
     image = Base64ImageField(required=False)
 
     class Meta:
         model = Recipe
-        fields = ('id', 'tags', 'author', 'ingredients',
-                  'is_favorited', 'is_in_shopping_cart', 'name',
-                  'image', 'text', 'cooking_time')
+        fields = (
+            'id', 'tags', 'author', 'ingredients',
+            'is_favorited', 'is_in_shopping_cart', 'name',
+            'image', 'text', 'cooking_time'
+        )
 
     def get_is_favorited(self, obj):
-        request = self.context.get('request')
-        return (request and request.user.is_authenticated
-                and Favorite.objects.filter(
-                    user=request.user, recipe=obj
-                ).exists()
-                )
+        request = self.context['request']
+        return (
+            request
+            and request.user.is_authenticated
+            and obj.favorites.filter(
+                user=request.user
+            ).exists()
+        )
 
     def get_is_in_shopping_cart(self, obj):
-        request = self.context.get('request')
-        return (request and request.user.is_authenticated
-                and ShoppingCart.objects.filter(
-                    user=request.user, recipe=obj
-                ).exists()
-                )
+        request = self.context['request']
+        return (
+            request
+            and request.user.is_authenticated
+            and obj.carts.filter(
+                user=request.user
+            ).exists()
+        )
 
 
 class RecipeCreateSerializer(serializers.ModelSerializer):
@@ -258,13 +276,13 @@ class FavoriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Favorite
         fields = '__all__'
-        validators = [
+        validators = (
             UniqueTogetherValidator(
                 queryset=Favorite.objects.all(),
                 fields=('user', 'recipe'),
                 message='Рецепт уже есть в избранном'
-            )
-        ]
+            ),
+        )
 
     def to_representation(self, instance):
         return RecipeSmallSerializer(
@@ -277,13 +295,13 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
     class Meta:
         model = ShoppingCart
         fields = '__all__'
-        validators = [
+        validators = (
             UniqueTogetherValidator(
                 queryset=ShoppingCart.objects.all(),
                 fields=('user', 'recipe'),
                 message='Рецепт уже есть покупах'
-            )
-        ]
+            ),
+        )
 
     def to_representation(self, instance):
         return RecipeSmallSerializer(
