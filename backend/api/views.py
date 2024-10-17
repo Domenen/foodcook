@@ -100,7 +100,9 @@ class UserSubscriptionsViewSet(mixins.ListModelMixin,
     pagination_class = FoodgramPagination
 
     def get_queryset(self):
-        return User.objects.filter(following__user=self.request.user)
+        return User.objects.filter(
+            subscriptions_on_author__user=self.request.user
+        )
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
