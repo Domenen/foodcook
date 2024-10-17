@@ -229,12 +229,12 @@ class GetLinkViewSet(APIView):
         link = request.build_absolute_uri()
         link_str = link.replace(
             f'/api/recipes/{pk}/get-link/',
-            f'/s/{recipe.short_url}'
+            f'/s/{recipe.url_slug}'
         )
         data = {"short-link": link_str}
         return Response(data)
 
 
-def redirect_to_recipe(request, short_url):
-    recipe = get_object_or_404(Recipe, short_url=short_url)
+def redirect_to_recipe(request, url_slug):
+    recipe = get_object_or_404(Recipe, url_slug=url_slug)
     return redirect(f'/recipes/{recipe.id}')

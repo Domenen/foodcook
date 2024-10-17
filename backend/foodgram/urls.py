@@ -9,7 +9,7 @@ from api.views import redirect_to_recipe
 urlpatterns = [
     path('api/', include('api.urls')),
     path('admin/', admin.site.urls),
-    path('s/<short_url>', redirect_to_recipe, name='redirect_full_url')
+    path('s/<slug:url_slug>', redirect_to_recipe, name='redirect_full_url')
 ]
 
 if settings.DEBUG:

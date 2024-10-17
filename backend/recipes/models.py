@@ -85,7 +85,7 @@ class Recipe(models.Model):
         ]
     )
 
-    short_url = models.CharField(
+    url_slug = models.CharField(
         max_length=LENGTH_SHORT_URL,
         unique=True,
         blank=True,
