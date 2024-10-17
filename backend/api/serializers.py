@@ -8,7 +8,7 @@ from recipes.models import (Favorite, Ingredient,
                             Recipe, RecipeIngredient,
                             ShoppingCart, Tag)
 from users.models import User, Subscription
-from .contants import (MIN_VALUE_INGREDIENTS,
+from .constants import (MIN_VALUE_INGREDIENTS,
                        MAX_VALUE_INGREDIENTS)
 
 
