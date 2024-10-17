@@ -261,7 +261,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def add_tags_and_ingredients_to_recipe(recipe, tags, ingredients):
-        recipe.tags.set(tags)
         RecipeIngredient.objects.bulk_create(
             RecipeIngredient(
                 recipe=recipe,
@@ -275,7 +274,16 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return RecipeGetSerializer(instance, context=self.context).data
 
 
-class FavoriteSerializer(serializers.ModelSerializer):
+class FavoriteAndShoppingCartSerializer(serializers.ModelSerializer):
+
+    def to_representation(self, instance):
+        return RecipeSmallSerializer(
+            instance.recipe,
+            context=self.context
+        ).data
+
+
+class FavoriteSerializer(FavoriteAndShoppingCartSerializer):
     class Meta:
         model = Favorite
         fields = '__all__'
@@ -287,14 +295,8 @@ class FavoriteSerializer(serializers.ModelSerializer):
             ),
         )
 
-    def to_representation(self, instance):
-        return RecipeSmallSerializer(
-            instance.recipe,
-            context=self.context
-        ).data
 
-
-class ShoppingCartSerializer(serializers.ModelSerializer):
+class ShoppingCartSerializer(FavoriteAndShoppingCartSerializer):
     class Meta:
         model = ShoppingCart
         fields = '__all__'
@@ -305,9 +307,3 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
                 message='Рецепт уже есть покупах'
             ),
         )
-
-    def to_representation(self, instance):
-        return RecipeSmallSerializer(
-            instance.recipe,
-            context=self.context
-        ).data
