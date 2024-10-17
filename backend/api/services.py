@@ -13,7 +13,9 @@ def create_model_recipe(request, instance, serializer):
 
 
 def delete_model_recipe(request, model, instance, error_msg):
-    del_obj = model.objects.filter(user=request.user, recipe=instance).exists().delete()
+    del_obj = model.objects.filter(
+        user=request.user, recipe=instance
+    ).exists().delete()
     if del_obj[0]:
         return Response(status=status.HTTP_204_NO_CONTENT)
     return Response(
