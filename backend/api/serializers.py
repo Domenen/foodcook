@@ -1,5 +1,5 @@
 from django.db import transaction
-from djoser.serializers import UserCreateSerializer, UserSerializer
+from djoser.serializers import UserSerializer
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
@@ -10,28 +10,24 @@ from recipes.models import (Favorite, Ingredient,
 from users.models import User, Subscription
 
 
-class UserSignUpSerializer(UserCreateSerializer):
-    class Meta:
-        model = User
-        fields = ('email', 'id', 'username', 'first_name',
-                  'last_name', 'password')
-
-
 class UserGetSerializer(UserSerializer):
     is_subscribed = serializers.SerializerMethodField()
 
-    class Meta:
-        model = User
-        fields = ('email', 'id', 'username', 'first_name',
-                  'last_name', 'is_subscribed', 'avatar')
+    class Meta(UserSerializer.Meta):
+        fields = UserSerializer.Meta.fields + (
+            'first_name', 'last_name',
+            'is_subscribed', 'avatar'
+        )
 
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
-        return (request.user.is_authenticated
-                and Subscription.objects.filter(
-                    user=request.user, author=obj
-                ).exists()
-                )
+        return (
+            request
+            and request.user.is_authenticated
+            and obj.subscriptions_on_author.filter(
+                user=request.user
+            ).exists()
+        )
 
 
 class AvatarSerializer(serializers.ModelSerializer):
@@ -49,18 +45,22 @@ class RecipeSmallSerializer(serializers.ModelSerializer):
 
 
 class UserSubscribeRepresentSerializer(UserGetSerializer):
-    is_subscribed = serializers.SerializerMethodField()
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
 
-    class Meta:
-        model = User
-        fields = ('email', 'id', 'username', 'first_name',
-                  'last_name', 'is_subscribed',
-                  'recipes', 'recipes_count', 'avatar')
-        read_only_fields = ('email', 'username', 'first_name', 'last_name',
-                            'is_subscribed', 'recipes',
-                            'recipes_count', 'avatar')
+    class Meta(UserSerializer.Meta):
+        fields = UserSerializer.Meta.fields + (
+            'first_name', 'last_name',
+            'is_subscribed', 'avatar',
+            'recipes', 'recipes_count',
+        )
+        read_only_fields = (
+            'email', 'username',
+            'first_name', 'last_name',
+            'is_subscribed', 'recipes',
+            'recipes_count', 'avatar'
+        )
+
 
     def get_recipes_count(self, obj):
         return obj.recipes.count()

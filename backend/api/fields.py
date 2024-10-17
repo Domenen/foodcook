@@ -1,3 +1,4 @@
+from drf_extra_fields.fields import Base64ImageField
 import base64
 import uuid
 
