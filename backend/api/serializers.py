@@ -1,5 +1,5 @@
 from django.db import transaction
-from djoser.serializers import UserSerializer
+from djoser.serializers import UserSerializer, UserCreateSerializer
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
@@ -13,13 +13,20 @@ from .constants import (
 )
 
 
+class UserSignUpSerializer(UserCreateSerializer): 
+    class Meta: 
+        model = User 
+        fields = ('email', 'id', 'username', 'first_name', 
+                  'last_name', 'password')
+
+
 class UserGetSerializer(UserSerializer):
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta(UserSerializer.Meta):
         fields = UserSerializer.Meta.fields + (
             'first_name', 'last_name',
-            'is_subscribed', 'avatar', 'username'
+            'is_subscribed', 'avatar',
         )
 
     def get_is_subscribed(self, obj):
