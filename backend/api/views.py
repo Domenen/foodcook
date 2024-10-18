@@ -20,15 +20,14 @@ from .filters import IngredientFilter, RecipeFilter
 from recipes.models import (Favorite, Ingredient, Recipe,
                             RecipeIngredient, ShoppingCart, Tag)
 from users.models import Subscription, User
+from .constants import LENGTH_SHORT_URL
 
-LENGTH_SHORT_URL = 10
 
-
-class CustomUserViewSet(UserViewSet):
+class FoodgramUserViewSet(UserViewSet):
     pagination_class = FoodgramPagination
 
     @action(
-        methods=['get'],
+        methods=('get'),
         detail=False,
         permission_classes=(IsAuthenticated, ),
         url_name='me',
@@ -37,7 +36,7 @@ class CustomUserViewSet(UserViewSet):
         return super().me(request, *args, **kwargs)
 
     @action(
-        methods=['put'],
+        methods=('put'),
         detail=False,
         permission_classes=(IsAuthenticated, ),
         url_path='me/avatar',
@@ -49,6 +48,7 @@ class CustomUserViewSet(UserViewSet):
 
     @avatar.mapping.delete
     def delete_avatar(self, request):
+        if request.user 
         data = request.data
         if 'avatar' not in data:
             data = {'avatar': None}
@@ -127,7 +127,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminAuthorOrReadOnly, )
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
-    http_method_names = ['get', 'post', 'patch', 'delete']
+    http_method_names = ('get', 'post', 'patch', 'delete')
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
@@ -136,7 +136,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(
         detail=True,
-        methods=['post', 'delete'],
+        methods=('post', 'delete'),
         permission_classes=(IsAuthenticated, )
     )
     def favorite(self, request, pk):
@@ -154,7 +154,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(
         detail=True,
-        methods=['post', 'delete'],
+        methods=('post', 'delete'),
         permission_classes=(IsAuthenticated, )
     )
     def shopping_cart(self, request, pk):
@@ -175,7 +175,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(
         detail=False,
-        methods=['get'],
+        methods=('get'),
         permission_classes=(AllowAny, )
     )
     def download_shopping_cart(self, request):
@@ -218,10 +218,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
 class GetLinkViewSet(APIView):
     queryset = Recipe.objects.all()
     permission_classes = (AllowAny,)
-    http_method_names = ['get']
+    http_method_names = ('get')
 
     @action(
-        detail=False, methods=["GET"],
+        detail=False, methods=("GET"),
         permission_classes=(AllowAny, )
     )
     def get(self, request, pk):
