@@ -20,7 +20,6 @@ from .filters import IngredientFilter, RecipeFilter
 from recipes.models import (Favorite, Ingredient, Recipe,
                             RecipeIngredient, ShoppingCart, Tag)
 from users.models import Subscription, User
-from .constants import LENGTH_SHORT_URL
 
 
 class CustomUserViewSet(UserViewSet):
