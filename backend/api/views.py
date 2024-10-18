@@ -20,9 +20,10 @@ from .filters import IngredientFilter, RecipeFilter
 from recipes.models import (Favorite, Ingredient, Recipe,
                             RecipeIngredient, ShoppingCart, Tag)
 from users.models import Subscription, User
+from .constants import LENGTH_SHORT_URL
 
 
-class FoodgramUserViewSet(UserViewSet):
+class CustomUserViewSet(UserViewSet):
     pagination_class = FoodgramPagination
 
     @action(
@@ -125,7 +126,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminAuthorOrReadOnly, )
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
-    http_method_names = ('get', 'post', 'patch', 'delete')
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
@@ -216,7 +217,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 class GetLinkViewSet(APIView):
     queryset = Recipe.objects.all()
     permission_classes = (AllowAny,)
-    http_method_names = ('get')
+    http_method_names = ['get']
 
     @action(
         detail=False, methods=("GET"),

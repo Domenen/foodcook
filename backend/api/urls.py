@@ -4,11 +4,11 @@ from rest_framework.routers import DefaultRouter
 from .views import (IngredientViewSet, RecipeViewSet, TagViewSet,
                     UserSubscribeView, UserSubscriptionsViewSet,
                     GetLinkViewSet,
-                    FoodgramUserViewSet)
+                    CustomUserViewSet)
 
 
 router = DefaultRouter()
-router.register(r'users', FoodgramUserViewSet, basename="me")
+router.register(r'users', CustomUserViewSet, basename="me")
 router.register(r'tags', TagViewSet, basename='tags')
 router.register(r'ingredients', IngredientViewSet, basename='ingredients')
 router.register(r'recipes', RecipeViewSet, basename='recipes')
