@@ -20,7 +20,6 @@ from .filters import IngredientFilter, RecipeFilter
 from recipes.models import (Favorite, Ingredient, Recipe,
                             RecipeIngredient, ShoppingCart, Tag)
 from users.models import Subscription, User
-from .constants import LENGTH_SHORT_URL
 
 
 class FoodgramUserViewSet(UserViewSet):
@@ -48,7 +47,6 @@ class FoodgramUserViewSet(UserViewSet):
 
     @avatar.mapping.delete
     def delete_avatar(self, request):
-        if request.user 
         data = request.data
         if 'avatar' not in data:
             data = {'avatar': None}
