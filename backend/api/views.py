@@ -26,7 +26,7 @@ class CustomUserViewSet(UserViewSet):
     pagination_class = FoodgramPagination
 
     @action(
-        methods=('get'),
+        methods=('get',),
         detail=False,
         permission_classes=(IsAuthenticated, ),
         url_name='me',
@@ -35,7 +35,7 @@ class CustomUserViewSet(UserViewSet):
         return super().me(request, *args, **kwargs)
 
     @action(
-        methods=('put'),
+        methods=('put',),
         detail=False,
         permission_classes=(IsAuthenticated, ),
         url_path='me/avatar',
@@ -134,7 +134,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(
         detail=True,
-        methods=('post', 'delete'),
+        methods=('post', 'delete',),
         permission_classes=(IsAuthenticated, )
     )
     def favorite(self, request, pk):
@@ -152,7 +152,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(
         detail=True,
-        methods=('post', 'delete'),
+        methods=('post', 'delete',),
         permission_classes=(IsAuthenticated, )
     )
     def shopping_cart(self, request, pk):
@@ -173,7 +173,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(
         detail=False,
-        methods=('get'),
+        methods=('get',),
         permission_classes=(AllowAny, )
     )
     def download_shopping_cart(self, request):
@@ -219,7 +219,7 @@ class GetLinkViewSet(APIView):
     http_method_names = ['get']
 
     @action(
-        detail=False, methods=("GET"),
+        detail=False, methods=("GET",),
         permission_classes=(AllowAny, )
     )
     def get(self, request, pk):
