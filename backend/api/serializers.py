@@ -13,14 +13,7 @@ from .constants import (
 )
 
 
-class UserSignUpSerializer(UserCreateSerializer):
-    class Meta:
-        model = User
-        fields = ('email', 'id', 'username', 'first_name',
-                  'last_name', 'password')
-
-
-class UserGetSerializer(UserSerializer):
+class UserGetSerializer(UserSerializer, UserCreateSerializer):
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta(UserSerializer.Meta):
