@@ -17,12 +17,16 @@ class UserGetSerializer(UserCreateSerializer):
     is_subscribed = serializers.SerializerMethodField()
     password = serializers.CharField(write_only=True)
 
-    class Meta(UserCreateSerializer.Meta):
+    class Meta:
         model = User
         fields = (
             'id', 'email', 'username', 'first_name', 'last_name', 'password',
             'is_subscribed', 'avatar'
         )
+
+    def create(self, validated_data):
+        user = User.objects.create_user(**validated_data)
+        return user
 
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
@@ -33,9 +37,6 @@ class UserGetSerializer(UserCreateSerializer):
                 user=request.user
             ).exists()
         )
-
-    def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
 
 
 class AvatarSerializer(serializers.ModelSerializer):
