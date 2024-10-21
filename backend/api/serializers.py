@@ -1,9 +1,9 @@
 from django.db import transaction
-from djoser.serializers import UserSerializer
+from djoser.serializers import UserSerializer, UserCreateSerializer
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
-from .fields import Base64ImageField
+from drf_extra_fields.fields import Base64ImageField
 from recipes.models import (Favorite, Ingredient,
                             Recipe, RecipeIngredient,
                             ShoppingCart, Tag)
@@ -13,18 +13,19 @@ from .constants import (
 )
 
 
-class UserGetSerializer(UserSerializer):
+class UserGetSerializer(UserCreateSerializer):
     is_subscribed = serializers.SerializerMethodField()
+    password = serializers.CharField(write_only=True)
 
-    class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields + (
-            'username',
-            'first_name', 'last_name',
-            'is_subscribed', 'avatar',
+    class Meta(UserCreateSerializer.Meta):
+        model = User
+        fields = (
+            'id', 'email', 'username', 'first_name', 'last_name', 'password',
+            'is_subscribed', 'avatar'
         )
 
     def get_is_subscribed(self, obj):
-        request = self.context['request']
+        request = self.context.get('request')
         return (
             request
             and request.user.is_authenticated
@@ -32,6 +33,9 @@ class UserGetSerializer(UserSerializer):
                 user=request.user
             ).exists()
         )
+
+    def create(self, validated_data):
+        return User.objects.create_user(**validated_data)
 
 
 class AvatarSerializer(serializers.ModelSerializer):
