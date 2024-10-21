@@ -3,8 +3,7 @@ from django.db import models
 from django.db.models import EmailField
 from django.forms import ValidationError
 
-MAX_LENGTH_NAME = 150
-MAX_LENGTH_EMAIL = 254
+from api.constants import MAX_LENGTH_NAME, MAX_LENGTH_EMAIL
 
 
 class User(AbstractUser):
