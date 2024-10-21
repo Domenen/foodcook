@@ -86,8 +86,8 @@ class FoodgramUserViewSet(UserViewSet):
         )
 
     @subscribe.mapping.delete
-    def unsubscribe(self, request, pk=None):
-        author = get_object_or_404(User, id=pk)
+    def unsubscribe(self, request, id=None):
+        author = get_object_or_404(User, id=id)
         deleted_count, _ = Subscription.objects.filter(
             user=request.user, author=author
         ).delete()
@@ -155,8 +155,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         methods=('get', 'post'),
         permission_classes=(IsAuthenticated,)
     )
-    def favorite(self, request, pk):
-        recipe = get_object_or_404(Recipe, id=pk)
+    def favorite(self, request, id):
+        recipe = get_object_or_404(Recipe, id=id)
         if request.method == 'GET':
             in_favorite = Favorite.objects.filter(
                 user=request.user, recipe=recipe
