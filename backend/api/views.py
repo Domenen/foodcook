@@ -210,14 +210,24 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(
         detail=False,
         methods=('get',),
-        permission_classes=(AllowAny,)
+        permission_classes=(IsAuthenticated,)  # Обязательная авторизация
     )
     def download_shopping_cart(request):
+        if not request.user.is_authenticated:
+            return Response(
+                {"detail": "Пользователь не авторизован."},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
         ingredients = RecipeIngredient.objects.filter(
             recipe__carts__user=request.user
         ).values(
             'ingredient__name', 'ingredient__measurement_unit'
         ).annotate(ingredient_amount=Sum('amount'))
+        if not ingredients.exists():
+            return Response(
+                {"detail": "Список покупок пуст."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         shopping_list = ['Список покупок:\n']
         for ingredient in ingredients:
@@ -230,20 +240,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
             temp_file.write("\n".join(shopping_list))
             temp_file.seek(0)
             response = FileResponse(temp_file, content_type='text/plain')
-            response[
-                'Content-Disposition'
-            ] = 'attachment; filename="shopping_cart.txt"'
+            response['Content-Disposition'] = 'attachment; filename="shopping_cart.txt"'
             return response
 
     @action(
-        detail=False, methods=('get',),
+        detail=True, methods=('get',),
         permission_classes=(AllowAny,),
     )
-    def get_link(self, request, id):
-        recipe = get_object_or_404(Recipe, id=id)
+    def get_link(self, request, pk):
+        recipe = get_object_or_404(Recipe, id=pk)
         link = request.build_absolute_uri()
         link_str = link.replace(
-            f'/api/recipes/{id}/get-link/',
+            f'/api/recipes/{pk}/get-link/',
             f'/s/{recipe.url_slug}'
         )
         data = {"short-link": link_str}
