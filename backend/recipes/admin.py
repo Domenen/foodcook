@@ -2,9 +2,7 @@ from django.contrib import admin
 
 from .models import (Favorite, Ingredient, Recipe,
                      RecipeIngredient, ShoppingCart, Tag)
-
-MIN_INGREDIENT = 1
-EXTRA = 1
+from api.constants import MIN_VALUE
 
 
 @admin.register(Tag)
@@ -22,13 +20,15 @@ class IngredientAdmin(admin.ModelAdmin):
 
 class RecipeIngredientInline(admin.TabularInline):
     model = RecipeIngredient
-    extra = EXTRA
-    min_num = MIN_INGREDIENT
+    extra = MIN_VALUE
+    min_num = MIN_VALUE
 
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'name', 'author', 'favorites_amount')
+    list_display = (
+        'pk', 'name', 'author', 'favorites_amount', 'display_tags'
+    )
     search_fields = ('name', 'author')
     list_filter = ('name', 'author', 'tags')
     inlines = [
@@ -38,6 +38,10 @@ class RecipeAdmin(admin.ModelAdmin):
     def favorites_amount(self, obj):
         return obj.favorites.count()
     favorites_amount.short_description = 'Кол-во в избранном'
+
+    def display_tags(self, obj):
+        return ", ".join([tag.name for tag in obj.tags.all()])
+    display_tags.short_description = 'Теги'
 
 
 @admin.register(RecipeIngredient)

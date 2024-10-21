@@ -9,7 +9,7 @@ from recipes.models import (Favorite, Ingredient,
                             ShoppingCart, Tag)
 from users.models import User, Subscription
 from .constants import (
-    MIN_VALUE_INGREDIENTS, MAX_VALUE_INGREDIENTS
+    MIN_VALUE, MAX_VALUE
 )
 
 
@@ -30,7 +30,7 @@ class UserGetSerializer(UserCreateSerializer):
         password = validated_data.get('password')
         first_name = validated_data.get('first_name')
         last_name = validated_data.get('last_name')
-        
+
         user = User.objects.create_user(
             username=username,
             email=email,
@@ -155,8 +155,8 @@ class IngredientPostSerializer(serializers.ModelSerializer):
         queryset=Ingredient.objects.all()
     )
     amount = serializers.IntegerField(
-        max_value=MAX_VALUE_INGREDIENTS,
-        min_value=MIN_VALUE_INGREDIENTS
+        max_value=MAX_VALUE,
+        min_value=MIN_VALUE
     )
 
     class Meta:
