@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser, UnicodeUsernameValidator
 from django.db import models
 from django.db.models import EmailField
+from django.forms import ValidationError
 
 MAX_LENGTH_NAME = 150
 MAX_LENGTH_EMAIL = 254
@@ -83,3 +84,13 @@ class Subscription(models.Model):
 
     def __str__(self):
         return f'{self.user.username} подписан на {self.author.username}'
+
+    def clean(self):
+        if self.user == self.author:
+            raise ValidationError(
+                'Нельзя подписать пользователя на самого себя!'
+            )
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)

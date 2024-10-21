@@ -169,7 +169,7 @@ class RecipeIngredient(models.Model):
 
 class FavoriteAndShoppingCartModel(models.Model):
     user = models.ForeignKey(
-        'User',
+        'auth.User',
         on_delete=models.CASCADE,
         related_name='%(class)ss',
         verbose_name='Пользователь'
