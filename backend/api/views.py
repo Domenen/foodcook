@@ -173,8 +173,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return create_model_recipe(request, recipe, FavoriteSerializer)
 
     @favorite.mapping.delete
-    def delete_favorite(self, request, id):
-        recipe = get_object_or_404(Recipe, id=id)
+    def delete_favorite(self, request, pk):
+        recipe = get_object_or_404(Recipe, id=pk)
         error_msg = 'Нет этого рецепта в избранном'
         return delete_model_recipe(request, Favorite, recipe, error_msg)
 
@@ -201,8 +201,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return create_model_recipe(request, recipe, ShoppingCartSerializer)
 
     @shopping_cart.mapping.delete
-    def delete_shopping_cart(self, request, id):
-        recipe = get_object_or_404(Recipe, id=id)
+    def delete_shopping_cart(self, request, pk):
+        recipe = get_object_or_404(Recipe, id=pk)
         error_msg = 'Нет этого рецепта в списке покупок'
         return delete_model_recipe(request, ShoppingCart, recipe, error_msg)
 
@@ -236,14 +236,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return response
 
     @action(
-        detail=True, methods=["GET"],
+        detail=False, methods=('get',),
         permission_classes=(AllowAny,),
     )
-    def get_link(self, request, pk=None):
-        recipe = get_object_or_404(Recipe, id=pk)
+    def get_link(self, request, id):
+        recipe = get_object_or_404(Recipe, id=id)
         link = request.build_absolute_uri()
         link_str = link.replace(
-            f'/api/recipes/{pk}/get-link/',
+            f'/api/recipes/{id}/get-link/',
             f'/s/{recipe.url_slug}'
         )
         data = {"short-link": link_str}

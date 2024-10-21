@@ -232,7 +232,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             )
 
         id_ingredients = {
-            ingredient['ingredient'] for ingredient in ingredients
+            ingredient['id'] for ingredient in ingredients
         }
         if len(ingredients) != len(id_ingredients):
             raise serializers.ValidationError(
