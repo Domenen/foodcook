@@ -211,7 +211,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(
         detail=True, methods=["GET"],
-        permission_classes=(AllowAny,)
+        permission_classes=(AllowAny,),
+        url_name='recipes-get-link'
     )
     def get_link(self, request, pk=None):
         recipe = get_object_or_404(Recipe, id=pk)
