@@ -8,34 +8,31 @@ from api.constants import MAX_LENGTH_NAME, MAX_LENGTH_EMAIL
 
 class User(AbstractUser):
     username = models.CharField(
-        verbose_name="Имя пользователя",
+        verbose_name='Имя пользователя',
         max_length=MAX_LENGTH_NAME,
         unique=True,
-        help_text="Введите имя пользователя "
-                  "(Только буквы, цифры и символы:  @/./+/-/_ )",
-        validators=[UnicodeUsernameValidator()],
+        help_text='ведите имя пользователя '
+                  '(Только буквы, цифры и символы:  @/./+/-/_ )',
+        validators=(UnicodeUsernameValidator()),
         error_messages={
-            "unique": "Пользователь с таким логином уже существует.",
+            'unique': 'Пользователь с таким логином уже существует.',
         },
     )
     first_name = models.CharField(
-        verbose_name="Имя",
-        help_text="Введите имя",
+        verbose_name='Имя',
+        help_text='Введите имя',
         max_length=MAX_LENGTH_NAME,
-        blank=False,
     )
     last_name = models.CharField(
-        verbose_name="Фамилия",
-        help_text="Введите фамилию",
+        verbose_name='Фамилия',
+        help_text='Введите фамилию',
         max_length=MAX_LENGTH_NAME,
-        blank=False,
     )
     email = EmailField(
-        verbose_name="E-mail",
-        help_text="Введите адрес электронной почты",
+        verbose_name='E-mail',
+        help_text='Введите адрес электронной почты',
         max_length=MAX_LENGTH_EMAIL,
         unique=True,
-        blank=False,
     )
     avatar = models.ImageField(
         'Аватар',
@@ -43,18 +40,18 @@ class User(AbstractUser):
         blank=True,
         null=True
     )
-    password = models.CharField(
-        'Пароль',
-        max_length=MAX_LENGTH_NAME
-    )
+
+    USERNAME_FIELD = 'email'
+
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     class Meta:
-        ordering = ['id']
+        ordering = ['username']
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.REQUIRED_FIELDS}"
 
 
 class Subscription(models.Model):
