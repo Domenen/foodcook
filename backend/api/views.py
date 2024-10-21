@@ -152,11 +152,24 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(
         detail=True,
-        methods=('post'),
+        methods=('get', 'post'),
         permission_classes=(IsAuthenticated,)
     )
     def favorite(self, request, pk):
         recipe = get_object_or_404(Recipe, id=pk)
+        if request.method == 'GET':
+            in_favorite = Favorite.objects.filter(
+                user=request.user, recipe=recipe
+            ).exists()
+            if in_favorite:
+                return Response(
+                    {"status": "Рецепт в избранном"},
+                    status=status.HTTP_200_OK
+                )
+            return Response(
+                {"status": "Рецепт не в избранном"},
+                status=status.HTTP_404_NOT_FOUND
+            )
         return create_model_recipe(request, recipe, FavoriteSerializer)
 
     @favorite.mapping.delete
@@ -167,11 +180,24 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(
         detail=True,
-        methods=('post'),
+        methods=('get', 'post'),
         permission_classes=(IsAuthenticated,)
     )
     def shopping_cart(self, request, pk):
         recipe = get_object_or_404(Recipe, id=pk)
+        if request.method == 'GET':
+            in_cart = ShoppingCart.objects.filter(
+                user=request.user, recipe=recipe
+            ).exists()
+            if in_cart:
+                return Response(
+                    {"status": "Рецепт в списке покупок"},
+                    status=status.HTTP_200_OK
+                )
+            return Response(
+                {"status": "Рецепт не в списке покупок"},
+                status=status.HTTP_404_NOT_FOUND
+            )
         return create_model_recipe(request, recipe, ShoppingCartSerializer)
 
     @shopping_cart.mapping.delete
