@@ -155,8 +155,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         methods=('get', 'post'),
         permission_classes=(IsAuthenticated,)
     )
-    def favorite(self, request, id):
-        recipe = get_object_or_404(Recipe, id=id)
+    def favorite(self, request, pk):
+        recipe = get_object_or_404(Recipe, id=pk)
         if request.method == 'GET':
             in_favorite = Favorite.objects.filter(
                 user=request.user, recipe=recipe
@@ -183,8 +183,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         methods=('get', 'post'),
         permission_classes=(IsAuthenticated,)
     )
-    def shopping_cart(self, request, id):
-        recipe = get_object_or_404(Recipe, id=id)
+    def shopping_cart(self, request, pk):
+        recipe = get_object_or_404(Recipe, id=pk)
         if request.method == 'GET':
             in_cart = ShoppingCart.objects.filter(
                 user=request.user, recipe=recipe
