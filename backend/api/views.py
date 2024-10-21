@@ -10,7 +10,6 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from .permissions import IsAdminAuthorOrReadOnly
 from .paginations import FoodgramPagination
 from .serializers import (AvatarSerializer, FavoriteSerializer,
                           RecipeCreateSerializer, RecipeGetSerializer,
@@ -143,10 +142,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         'author'
     ).prefetch_related('tags', 'ingredients')
     pagination_class = FoodgramPagination
-    permission_classes = (IsAdminAuthorOrReadOnly, )
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
-    http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
