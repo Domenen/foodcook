@@ -173,8 +173,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return create_model_recipe(request, recipe, FavoriteSerializer)
 
     @favorite.mapping.delete
-    def delete_favorite(self, request, pk):
-        recipe = get_object_or_404(Recipe, id=pk)
+    def delete_favorite(self, request, id):
+        recipe = get_object_or_404(Recipe, id=id)
         error_msg = 'Нет этого рецепта в избранном'
         return delete_model_recipe(request, Favorite, recipe, error_msg)
 
@@ -183,8 +183,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         methods=('get', 'post'),
         permission_classes=(IsAuthenticated,)
     )
-    def shopping_cart(self, request, pk):
-        recipe = get_object_or_404(Recipe, id=pk)
+    def shopping_cart(self, request, id):
+        recipe = get_object_or_404(Recipe, id=id)
         if request.method == 'GET':
             in_cart = ShoppingCart.objects.filter(
                 user=request.user, recipe=recipe
@@ -201,8 +201,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return create_model_recipe(request, recipe, ShoppingCartSerializer)
 
     @shopping_cart.mapping.delete
-    def delete_shopping_cart(self, request, pk):
-        recipe = get_object_or_404(Recipe, id=pk)
+    def delete_shopping_cart(self, request, id):
+        recipe = get_object_or_404(Recipe, id=id)
         error_msg = 'Нет этого рецепта в списке покупок'
         return delete_model_recipe(request, ShoppingCart, recipe, error_msg)
 
