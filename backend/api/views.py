@@ -1,5 +1,5 @@
 import tempfile
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
@@ -33,8 +33,7 @@ class FoodgramUserViewSet(UserViewSet):
         url_name='signup',
     )
     def signup(self, request):
-        instance = self.get_instance()
-        serializer = UserCreateSerializer(instance, data=request.data)
+        serializer = UserCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -110,7 +109,7 @@ class FoodgramUserViewSet(UserViewSet):
     def subscriptions(self, request):
         queryset = User.objects.filter(
             subscriptions_on_author__user=request.user
-        )
+        ).annotate(recipes_count=Count('recipes'))
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = UserSubscribeRepresentSerializer(

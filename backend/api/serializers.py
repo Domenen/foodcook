@@ -54,7 +54,7 @@ class RecipeSmallSerializer(serializers.ModelSerializer):
 
 class UserSubscribeRepresentSerializer(UserGetSerializer):
     recipes = serializers.SerializerMethodField()
-    recipes_count = serializers.SerializerMethodField()
+    recipes_count = serializers.IntegerField(read_only=True)
 
     class Meta(UserSerializer.Meta):
         fields = UserSerializer.Meta.fields + (
@@ -68,9 +68,6 @@ class UserSubscribeRepresentSerializer(UserGetSerializer):
             'is_subscribed', 'recipes',
             'recipes_count', 'avatar'
         )
-
-    def get_recipes_count(self, obj):
-        return obj.recipes.count()
 
     def get_recipes(self, obj):
         request = self.context['request']
