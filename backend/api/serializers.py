@@ -198,7 +198,7 @@ class RecipeGetSerializer(serializers.ModelSerializer):
         return (
             request
             and request.user.is_authenticated
-            and obj.carts.filter(
+            and obj.shoppingcarts.filter(
                 user=request.user
             ).exists()
         )
