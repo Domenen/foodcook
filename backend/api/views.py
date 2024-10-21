@@ -208,7 +208,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(
         detail=False,
-        methods=['get'],
+        methods=('get'),
         permission_classes=(AllowAny,)
     )
     def download_shopping_cart(self, request):
@@ -231,7 +231,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @staticmethod
     def generate_shopping_list(ingredients):
-        """Статический метод для генерации списка покупок."""
         shopping_list = ['Список покупок:\n']
         for ingredient in ingredients:
             name = ingredient['ingredient__name']
@@ -246,10 +245,5 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def get_link(self, request, pk):
         recipe = get_object_or_404(Recipe, id=pk)
-        link = request.build_absolute_uri()
-        link_str = link.replace(
-            f'/api/recipes/{pk}/get-link/',
-            f'/s/{recipe.url_slug}'
-        )
-        data = {"short-link": link_str}
-        return Response(data)
+        link = request.build_absolute_uri(f'/s/{recipe.url_slug}')
+        return Response({"short-link": link})
