@@ -25,8 +25,7 @@ class UserGetSerializer(UserCreateSerializer):
         )
 
     def create(self, validated_data):
-        user = User.objects.create_user(**validated_data)
-        return user
+        return User.objects.create_user(**validated_data)
 
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
