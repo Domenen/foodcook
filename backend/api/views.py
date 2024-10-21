@@ -73,8 +73,8 @@ class FoodgramUserViewSet(UserViewSet):
         url_path='subscribe',
         url_name='subscribe',
     )
-    def subscribe(self, request, pk=None):
-        author = get_object_or_404(User, id=pk)
+    def subscribe(self, request, id=None):
+        author = get_object_or_404(User, id=id)
         serializer = UserSubscribeSerializer(
             data={'user': request.user.id, 'author': author.id},
             context={'request': request}
@@ -212,7 +212,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(
         detail=True, methods=["GET"],
         permission_classes=(AllowAny,),
-        url_path='<int:pk>/get-link/'
     )
     def get_link(self, request, pk=None):
         recipe = get_object_or_404(Recipe, id=pk)

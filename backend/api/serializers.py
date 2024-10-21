@@ -225,7 +225,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                 {'tags': 'Нужен уникальный тэг'}
             )
 
-        ingredients = data.get('recipe__recipe_ingredients', [])
+        ingredients = data.get('ingredients', [])
         if not ingredients:
             raise serializers.ValidationError(
                 {'ingredients': 'Нужен минимум 1 ингридиент'}
