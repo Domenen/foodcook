@@ -1,8 +1,8 @@
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.utils.crypto import get_random_string
 
+from .services import generate_url_slug
 from api.constants import (
     MAX_LENGTH_TAGS, MIN_VALUE,
     LENGTH_SHORT_URL, MAX_LENGTH_INGREDIENT,
@@ -118,15 +118,9 @@ class Recipe(models.Model):
     def __str__(self):
         return self.name
 
-    def generate_url_slug(self):
-        while True:
-            url_slug = get_random_string(length=LENGTH_SHORT_URL)
-            if not Recipe.objects.filter(url_slug=url_slug).exists():
-                return url_slug
-
     def save(self, *args, **kwargs):
         if not self.url_slug:
-            self.url_slug = self.generate_url_slug()
+            self.url_slug = generate_url_slug(self.__class__, LENGTH_SHORT_URL)
         super().save(*args, **kwargs)
 
 
