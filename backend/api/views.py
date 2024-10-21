@@ -206,42 +206,39 @@ class RecipeViewSet(viewsets.ModelViewSet):
         error_msg = 'Нет этого рецепта в списке покупок'
         return delete_model_recipe(request, ShoppingCart, recipe, error_msg)
 
-    @staticmethod
     @action(
         detail=False,
-        methods=('get',),
-        permission_classes=(IsAuthenticated,)  # Обязательная авторизация
+        methods=['get'],
+        permission_classes=(AllowAny,)
     )
-    def download_shopping_cart(request):
-        if not request.user.is_authenticated:
-            return Response(
-                {"detail": "Пользователь не авторизован."},
-                status=status.HTTP_401_UNAUTHORIZED
-            )
+    def download_shopping_cart(self, request):
         ingredients = RecipeIngredient.objects.filter(
             recipe__carts__user=request.user
         ).values(
             'ingredient__name', 'ingredient__measurement_unit'
         ).annotate(ingredient_amount=Sum('amount'))
-        if not ingredients.exists():
-            return Response(
-                {"detail": "Список покупок пуст."},
-                status=status.HTTP_400_BAD_REQUEST
+        shopping_list = self.generate_shopping_list(ingredients)
+        with tempfile.NamedTemporaryFile(
+            mode='w+', delete=False
+        ) as temp_file:
+            temp_file.write(shopping_list)
+            temp_file.seek(0)
+            response = FileResponse(temp_file, content_type='text/plain')
+            response['Content-Disposition'] = (
+                'attachment; filename="shopping_cart.txt"'
             )
+            return response
 
+    @staticmethod
+    def generate_shopping_list(ingredients):
+        """Статический метод для генерации списка покупок."""
         shopping_list = ['Список покупок:\n']
         for ingredient in ingredients:
             name = ingredient['ingredient__name']
             unit = ingredient['ingredient__measurement_unit']
             amount = ingredient['ingredient_amount']
             shopping_list.append(f'\n{name} - {amount}, {unit}')
-
-        with tempfile.NamedTemporaryFile(mode='w+', delete=False) as temp_file:
-            temp_file.write("\n".join(shopping_list))
-            temp_file.seek(0)
-            response = FileResponse(temp_file, content_type='text/plain')
-            response['Content-Disposition'] = 'attachment; filename="shopping_cart.txt"'
-            return response
+        return "\n".join(shopping_list)
 
     @action(
         detail=True, methods=('get',),
