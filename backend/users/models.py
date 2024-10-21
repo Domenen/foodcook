@@ -13,7 +13,7 @@ class User(AbstractUser):
         unique=True,
         help_text='ведите имя пользователя '
                   '(Только буквы, цифры и символы:  @/./+/-/_ )',
-        validators=(UnicodeUsernameValidator()),
+        validators=(UnicodeUsernameValidator(),),
         error_messages={
             'unique': 'Пользователь с таким логином уже существует.',
         },
