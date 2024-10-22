@@ -40,8 +40,14 @@ class RecipeAdmin(admin.ModelAdmin):
     favorites_amount.short_description = 'Кол-во в избранном'
 
     def display_tags(self, obj):
-        return ", ".join([tag.name for tag in obj.tags.all()])
+        return ', '.join([tag.name for tag in obj.tags.all()])
     display_tags.short_description = 'Теги'
+
+    def display_ingredients(self, obj):
+        return ', '.join(
+            [ingredient.name for ingredient in obj.ingredients.all()]
+        )
+    display_ingredients.short_description = 'Ингредиенты'
 
 
 @admin.register(RecipeIngredient)

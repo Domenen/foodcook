@@ -4,42 +4,38 @@ from pathlib import Path
 from django.core.management.base import BaseCommand
 
 from recipes.models import Ingredient
-from foodgram.settings import FILE_PATH_INGREDIENTS
+from django.conf import settings
 
 
 class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
-        csv_file = Path(FILE_PATH_INGREDIENTS / 'ingredients.csv')
-        if csv_file.exists():
+        csv_file = Path(settings.FILE_PATH_INGREDIENTS / 'ingredients.csv')
 
+        try:
             with open(csv_file, 'r', encoding='utf-8') as file:
                 reader = csv.reader(file)
-                for row in reader:
-                    name = row[0].strip()
-                    measurement_unit = row[1].strip()
-
-                    created = Ingredient.objects.bulk_create(
-                        objs=[Ingredient(
-                            name=name,
-                            measurement_unit=measurement_unit
-                        )for name in row],
-                        ignore_conflicts=True
+                ingredients = [
+                    Ingredient(
+                        name=name.strip(),
+                        measurement_unit=measurement_unit.strip()
                     )
-                    if created:
-                        self.stdout.write(self.style.SUCCESS(
-                            f'Добавленно: {name} ({measurement_unit})')
-                        )
-                    elif not created:
-                        self.stdout.write(self.style.SUCCESS(
-                            f'Уже есть: {name} ({measurement_unit})')
-                        )
+                    for name, measurement_unit in reader
+                ]
+                Ingredient.objects.bulk_create(
+                    ingredients, ignore_conflicts=True
+                )
 
-                    else:
-                        self.stdout.write(self.style.ERROR(
-                            f'Проблемы с форматом: {row}, {measurement_unit}'
-                        ))
-        else:
+                self.stdout.write(self.style.SUCCESS(
+                    'Ингредиенты успешно загружены.'
+                ))
+
+        except FileNotFoundError:
             self.stdout.write(self.style.ERROR(
-                f'Не найден {FILE_PATH_INGREDIENTS}/ingredients.csv'
+                f'Файл не найден: '
+                f'{settings.FILE_PATH_INGREDIENTS}/ingredients.csv'
+            ))
+        except Exception as e:
+            self.stdout.write(self.style.ERROR(
+                f'Ошибка при открытии файла: {str(e)}'
             ))

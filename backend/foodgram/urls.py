@@ -3,13 +3,13 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
-from recipes.services import redirect_to_recipe
+from recipes.views import redirect_to_recipe
 
 
 urlpatterns = [
     path('api/', include('api.urls')),
     path('admin/', admin.site.urls),
-    path('s/<slug:url_slug>', redirect_to_recipe, name='redirect_full_url')
+    path('s/<slug:slug>', redirect_to_recipe, name='redirect_full_url')
 ]
 
 if settings.DEBUG:

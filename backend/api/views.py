@@ -1,9 +1,8 @@
-from django.db.models import Sum, Count, F
+from django.db.models import Sum, Count
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
-from djoser.serializers import UserCreateSerializer
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -14,7 +13,7 @@ from .serializers import (AvatarSerializer, FavoriteSerializer,
                           RecipeCreateSerializer, RecipeGetSerializer,
                           ShoppingCartSerializer, IngredientSerializer,
                           TagSerialiser, UserSubscribeRepresentSerializer,
-                          UserSubscribeSerializer)
+                          UserSubscribeSerializer, RecipeIngredient)
 from .services import (
     create_model_recipe, delete_model_recipe, shopping_cart_list
 )
@@ -26,17 +25,6 @@ from users.models import Subscription, User
 
 class FoodgramUserViewSet(UserViewSet):
     pagination_class = FoodgramPagination
-
-    @action(
-        methods=('post',),
-        detail=False,
-        url_name='signup',
-    )
-    def signup(self, request):
-        serializer = UserCreateSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(
         methods=('get',),
@@ -63,8 +51,9 @@ class FoodgramUserViewSet(UserViewSet):
 
     @avatar.mapping.delete
     def delete_avatar(self, request):
-        request.user.avatar = None
-        request.user.save()
+        user = request.user
+        if user.avatar:
+            user.avatar.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
@@ -92,7 +81,7 @@ class FoodgramUserViewSet(UserViewSet):
         deleted_count, _ = Subscription.objects.filter(
             user=request.user, author=author
         ).delete()
-        if deleted_count > 0:
+        if deleted_count:
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(
             {'errors': 'Вы не подписаны на этого пользователя'},
@@ -158,19 +147,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def favorite(self, request, pk):
         recipe = get_object_or_404(Recipe, id=pk)
-        if request.method == 'GET':
-            in_favorite = Favorite.objects.filter(
-                user=request.user, recipe=recipe
-            ).exists()
-            if in_favorite:
-                return Response(
-                    {"status": "Рецепт в избранном"},
-                    status=status.HTTP_200_OK
-                )
-            return Response(
-                {"status": "Рецепт не в избранном"},
-                status=status.HTTP_404_NOT_FOUND
-            )
         return create_model_recipe(request, recipe, FavoriteSerializer)
 
     @favorite.mapping.delete
@@ -186,19 +162,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def shopping_cart(self, request, pk):
         recipe = get_object_or_404(Recipe, id=pk)
-        if request.method == 'GET':
-            in_cart = ShoppingCart.objects.filter(
-                user=request.user, recipe=recipe
-            ).exists()
-            if in_cart:
-                return Response(
-                    {"status": "Рецепт в списке покупок"},
-                    status=status.HTTP_200_OK
-                )
-            return Response(
-                {"status": "Рецепт не в списке покупок"},
-                status=status.HTTP_404_NOT_FOUND
-            )
         return create_model_recipe(request, recipe, ShoppingCartSerializer)
 
     @shopping_cart.mapping.delete
@@ -214,23 +177,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=(IsAuthenticated,)
     )
     def download_shopping_cart(self, request):
-        cart = request.user.shoppingcarts.prefetch_related(
-            'recipe__recipeingredients__ingredient'
-        ).annotate(
-            ingredient_name=F('recipe__recipeingredients__ingredient__name'),
-            ingredient_unit=F(
-                'recipe__recipeingredients__ingredient__measurement_unit'
-            ),
-            total_amount=Sum('recipe__recipeingredients__amount')
+        ingredients = RecipeIngredient.objects.filter(
+            recipe__shoppingcarts__user=request.user
         ).values(
-            'recipe__id',
-            'ingredient_name',
-            'ingredient_unit',
-            'total_amount'
-        )
-        cart_recipes = Recipe.objects.filter(id__in=cart.values('recipe__id'))
+            'ingredient__name', 'ingredient__measurement_unit'
+        ).annotate(ingredient_amount=Sum('amount'))
+        shopping_list = self.generate_shopping_list(ingredients)
         return FileResponse(
-            shopping_cart_list(cart, cart_recipes),
+            shopping_cart_list(ingredients, shopping_list),
             content_type='text/plain; charset=utf-8'
         )
 
@@ -242,5 +196,5 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def get_link(self, request, pk):
         recipe = get_object_or_404(Recipe, id=pk)
-        link = request.build_absolute_uri(f'/s/{recipe.url_slug}')
-        return Response({"short-link": link})
+        link = request.build_absolute_uri(f'/s/{recipe.slug}')
+        return Response({'short-link': link})

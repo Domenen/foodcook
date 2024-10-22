@@ -45,12 +45,12 @@ class Ingredient(models.Model):
     class Meta:
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
-        constraints = [
+        constraints = (
             models.UniqueConstraint(
                 fields=['name', 'measurement_unit'],
                 name='unique_name_measurement_unit'
-            )
-        ]
+            ),
+        )
 
     def __str__(self):
         return self.name
@@ -97,7 +97,7 @@ class Recipe(models.Model):
         )
     )
 
-    url_slug = models.CharField(
+    slug = models.CharField(
         max_length=LENGTH_SHORT_URL,
         unique=True,
         blank=True,
@@ -140,12 +140,17 @@ class RecipeIngredient(models.Model):
     )
     amount = models.PositiveSmallIntegerField(
         'Количество',
-        validators=[
+        validators=(
             MinValueValidator(
                 MIN_VALUE,
-                'Колличество ингридиентов должно быть больше 1'
+                f'Колличество ингридиентов должно быть больше {MIN_VALUE}'
+            ),
+            MaxValueValidator(
+                MAX_VALUE_COOKING,
+                f'Колличество ингридиентов должно быть меньше'
+                f'{MAX_VALUE_COOKING}'
             )
-        ]
+        )
     )
 
     class Meta:
@@ -162,7 +167,7 @@ class RecipeIngredient(models.Model):
         return self.ingredient.name
 
 
-class FavoriteAndShoppingCartModel(models.Model):
+class FavoriteShoppingCartModel(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -178,7 +183,6 @@ class FavoriteAndShoppingCartModel(models.Model):
 
     class Meta:
         abstract = True
-        ordering = ['-id']
 
     def __str__(self):
         return (
@@ -187,8 +191,8 @@ class FavoriteAndShoppingCartModel(models.Model):
         )
 
 
-class Favorite(FavoriteAndShoppingCartModel):
-    class Meta(FavoriteAndShoppingCartModel.Meta):
+class Favorite(FavoriteShoppingCartModel):
+    class Meta(FavoriteShoppingCartModel.Meta):
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранное'
         constraints = [
@@ -199,8 +203,8 @@ class Favorite(FavoriteAndShoppingCartModel):
         ]
 
 
-class ShoppingCart(FavoriteAndShoppingCartModel):
-    class Meta(FavoriteAndShoppingCartModel.Meta):
+class ShoppingCart(FavoriteShoppingCartModel):
+    class Meta(FavoriteShoppingCartModel.Meta):
         verbose_name = 'Список покупок'
         verbose_name_plural = 'Списки покупок'
         constraints = [
