@@ -213,7 +213,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def download_shopping_cart(self, request):
         ingredients = RecipeIngredient.objects.filter(
-            recipe__carts__user=request.user
+            recipe__shoppingcarts__user=request.user
         ).values(
             'ingredient__name', 'ingredient__measurement_unit'
         ).annotate(ingredient_amount=Sum('amount'))
@@ -240,8 +240,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return "\n".join(shopping_list)
 
     @action(
-        detail=True, methods=('get',),
+        detail=True,
+        methods=('get',),
         permission_classes=(AllowAny,),
+        url_path='get-link'
     )
     def get_link(self, request, pk):
         recipe = get_object_or_404(Recipe, id=pk)
