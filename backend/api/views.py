@@ -207,9 +207,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return delete_model_recipe(request, ShoppingCart, recipe, error_msg)
 
     @action(
-    detail=False,
-    methods=('get',),
-    permission_classes=(IsAuthenticated,)
+        detail=False,
+        methods=('get',),
+        permission_classes=(IsAuthenticated,)
     )
     def download_shopping_cart(self, request):
         ingredients = RecipeIngredient.objects.filter(
