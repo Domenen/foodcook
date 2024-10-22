@@ -1,5 +1,4 @@
-import tempfile
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, F
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
@@ -16,10 +15,12 @@ from .serializers import (AvatarSerializer, FavoriteSerializer,
                           ShoppingCartSerializer, IngredientSerializer,
                           TagSerialiser, UserSubscribeRepresentSerializer,
                           UserSubscribeSerializer)
-from .services import create_model_recipe, delete_model_recipe
+from .services import (
+    create_model_recipe, delete_model_recipe, shopping_cart_list
+)
 from .filters import IngredientFilter, RecipeFilter
 from recipes.models import (Favorite, Ingredient, Recipe,
-                            RecipeIngredient, ShoppingCart, Tag)
+                            ShoppingCart, Tag)
 from users.models import Subscription, User
 
 
@@ -209,37 +210,29 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(
         detail=False,
         methods=('get',),
+        url_path='download_shopping_cart',
         permission_classes=(IsAuthenticated,)
     )
     def download_shopping_cart(self, request):
-        ingredients = RecipeIngredient.objects.filter(
-            recipe__shoppingcarts__user=request.user
+        cart = request.user.shoppingcarts.prefetch_related(
+            'recipe__recipeingredients__ingredient'
+        ).annotate(
+            ingredient_name=F('recipe__recipeingredients__ingredient__name'),
+            ingredient_unit=F(
+                'recipe__recipeingredients__ingredient__measurement_unit'
+            ),
+            total_amount=Sum('recipe__recipeingredients__amount')
         ).values(
-            'ingredient__name', 'ingredient__measurement_unit'
-        ).annotate(ingredient_amount=Sum('amount'))
-
-        shopping_list = self.generate_shopping_list(ingredients)
-
-        with tempfile.NamedTemporaryFile(
-            mode='w+', delete=False
-        ) as temp_file:
-            temp_file.write(shopping_list)
-            temp_file.seek(0)
-            response = FileResponse(temp_file, content_type='text/plain')
-            response['Content-Disposition'] = (
-                'attachment; filename="shopping_cart.txt"'
-            )
-            return response
-
-    @staticmethod
-    def generate_shopping_list(ingredients):
-        shopping_list = ['Список покупок:\n']
-        for ingredient in ingredients:
-            name = ingredient['ingredient__name']
-            unit = ingredient['ingredient__measurement_unit']
-            amount = ingredient['ingredient_amount']
-            shopping_list.append(f'{name} - {amount} {unit}\n')
-        return ''.join(shopping_list)
+            'recipe__id',
+            'ingredient_name',
+            'ingredient_unit',
+            'total_amount'
+        )
+        cart_recipes = Recipe.objects.filter(id__in=cart.values('recipe__id'))
+        return FileResponse(
+            shopping_cart_list(cart, cart_recipes),
+            content_type='text/plain; charset=utf-8'
+        )
 
     @action(
         detail=True,
