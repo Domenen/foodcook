@@ -207,9 +207,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return delete_model_recipe(request, ShoppingCart, recipe, error_msg)
 
     @action(
-        detail=False,
-        methods=('get',),
-        permission_classes=(IsAuthenticated,)
+    detail=False,
+    methods=('get',),
+    permission_classes=(IsAuthenticated,)
     )
     def download_shopping_cart(self, request):
         ingredients = RecipeIngredient.objects.filter(
@@ -217,7 +217,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         ).values(
             'ingredient__name', 'ingredient__measurement_unit'
         ).annotate(ingredient_amount=Sum('amount'))
+
         shopping_list = self.generate_shopping_list(ingredients)
+
         with tempfile.NamedTemporaryFile(
             mode='w+', delete=False
         ) as temp_file:
@@ -236,8 +238,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
             name = ingredient['ingredient__name']
             unit = ingredient['ingredient__measurement_unit']
             amount = ingredient['ingredient_amount']
-            shopping_list.append(f'\n{name} - {amount}, {unit}')
-        return "\n".join(shopping_list)
+            shopping_list.append(f'{name} - {amount} {unit}\n')
+        return ''.join(shopping_list)
 
     @action(
         detail=True,
