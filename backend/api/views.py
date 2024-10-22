@@ -182,11 +182,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
         ).values(
             'ingredient__name', 'ingredient__measurement_unit'
         ).annotate(ingredient_amount=Sum('amount'))
-        shopping_list = generate_shopping_list(ingredients)
-        return FileResponse(
-            shopping_cart_list(ingredients, shopping_list),
+        shopping_list_text = generate_shopping_list(ingredients)
+        response = FileResponse(
+            shopping_list_text,
             content_type='text/plain; charset=utf-8'
         )
+        response[
+            'Content-Disposition'
+        ] = 'attachment; filename="shopping_list.txt"'
+        return response
 
     @action(
         detail=True,
