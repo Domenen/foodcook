@@ -26,7 +26,7 @@ def delete_model_recipe(request, model, instance, error_msg):
     )
 
 
-def shopping_cart_list(ingredients, cart_recipes):
+def generate_shopping_list(ingredients, cart_recipes):
     today = datetime.datetime.now().strftime('%d-%m-%Y')
     ingredients_info = [
         f'{i}. {ingredient["ingredient_name"].capitalize()}'
