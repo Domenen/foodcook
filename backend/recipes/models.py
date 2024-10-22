@@ -119,8 +119,8 @@ class Recipe(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        if not self.url_slug:
-            self.url_slug = generate_url_slug(self.__class__, LENGTH_SHORT_URL)
+        if not self.slug:
+            self.slug = generate_url_slug(self.__class__, LENGTH_SHORT_URL)
         super().save(*args, **kwargs)
 
 
