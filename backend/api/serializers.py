@@ -291,7 +291,7 @@ class FavoriteAndShoppingCartSerializer(serializers.ModelSerializer):
             context=self.context
         ).data
 
-
+url_slug
 class FavoriteSerializer(FavoriteAndShoppingCartSerializer):
     class Meta:
         model = Favorite
