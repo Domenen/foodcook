@@ -29,9 +29,9 @@ def delete_model_recipe(request, model, instance, error_msg):
 def generate_shopping_list(ingredients, cart_recipes):
     today = datetime.datetime.now().strftime('%d-%m-%Y')
     ingredients_info = [
-        f'{i}. {ingredient["ingredient_name"].capitalize()}'
-        f'({ingredient["ingredient_unit"]}) - '
-        f'{ingredient["total_amount"]}'
+        f'{i}. {ingredient["ingredient__name"].capitalize()} '
+        f'({ingredient["ingredient__measurement_unit"]}) - '
+        f'{ingredient["ingredient_amount"]}'
         for i, ingredient in enumerate(ingredients, start=1)
     ]
     recipe_names = [f' - {recipe.name}' for recipe in cart_recipes]
