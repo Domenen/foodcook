@@ -8,7 +8,7 @@ from api.constants import MAX_LENGTH_NAME, MAX_LENGTH_EMAIL
 
 class User(AbstractUser):
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
+    REQUIRED_FIELDS = ('username', 'first_name', 'last_name')
 
     username = models.CharField(
         verbose_name='Имя пользователя',
@@ -50,7 +50,7 @@ class User(AbstractUser):
         verbose_name_plural = 'Пользователи'
 
     def __str__(self):
-        return f"{self.REQUIRED_FIELDS}"
+        return f'{self.REQUIRED_FIELDS}'
 
 
 class Subscription(models.Model):
@@ -68,12 +68,12 @@ class Subscription(models.Model):
     )
 
     class Meta:
-        constraints = [
+        constraints = (
             models.UniqueConstraint(
-                fields=['user', 'author'],
+                fields=('user', 'author'),
                 name='unique_user_author'
-            )
-        ]
+            ),
+        )
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
 

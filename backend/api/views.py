@@ -51,9 +51,7 @@ class FoodgramUserViewSet(UserViewSet):
 
     @avatar.mapping.delete
     def delete_avatar(self, request):
-        user = request.user
-        if user.avatar:
-            user.avatar.delete()
+        request.user.avatar.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
@@ -181,7 +179,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
             recipe__shoppingcarts__user=request.user
         ).values(
             'ingredient__name', 'ingredient__measurement_unit'
-        ).annotate(ingredient_amount=Sum('amount'))
+        ).annotate(
+            ingredient_amount=Sum('amount')
+        ).order_by('ingredient__name')
 
         cart_recipes = Recipe.objects.filter(
             shoppingcarts__user=request.user

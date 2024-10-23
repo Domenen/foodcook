@@ -1,6 +1,6 @@
 from django.db import transaction
 from django.forms import ValidationError
-from djoser.serializers import UserSerializer, UserCreateSerializer
+from djoser.serializers import UserSerializer
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 from drf_extra_fields.fields import Base64ImageField
@@ -14,7 +14,7 @@ from .constants import (
 )
 
 
-class UserGetSerializer(UserCreateSerializer):
+class UserGetSerializer(UserSerializer):
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
@@ -214,7 +214,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         tags = data.get('tags', [])
-        if not len(tags):
+        if not tags:
             raise serializers.ValidationError(
                 {'tags': 'Нужен тэг'}
             )
@@ -276,13 +276,15 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
 class FavoriteAndShoppingCartSerializer(serializers.ModelSerializer):
 
+    model_name = ''
+
     def validate(self, data):
         user = self.context['request'].user
         recipe = data.get('recipe')
+        model = self.Meta.model
 
-        if self.Meta.model.objects.filter(user=user, recipe=recipe).exists():
-            model_name = self.Meta.model._meta.verbose_name.lower()
-            raise ValidationError(f'Рецепт уже есть в {model_name}')
+        if model.objects.filter(user=user, recipe=recipe).exists():
+            raise ValidationError(f'Рецепт уже есть в {self.model_name}')
         return data
 
     def to_representation(self, instance):
@@ -293,12 +295,16 @@ class FavoriteAndShoppingCartSerializer(serializers.ModelSerializer):
 
 
 class FavoriteSerializer(FavoriteAndShoppingCartSerializer):
+    model_name = 'избранное'
+
     class Meta:
         model = Favorite
         fields = '__all__'
 
 
 class ShoppingCartSerializer(FavoriteAndShoppingCartSerializer):
+    model_name = 'список покупок'
+
     class Meta:
         model = ShoppingCart
         fields = '__all__'

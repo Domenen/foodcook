@@ -10,6 +10,8 @@ services:
     volumes:
       - pg_data_production:/var/lib/postgresql/data
   backend:
+    depends_on: 
+      - db
     image: domenen/foodgram_backend
     env_file: .env
     volumes:
@@ -22,6 +24,9 @@ services:
     volumes:
       - static_volume:/frontend_static
   gateway:
+    depends_on:
+      - backend
+      - frontend
     image: domenen/foodgram_gateway
     env_file: .env
     volumes:
