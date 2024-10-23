@@ -182,7 +182,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
         ).values(
             'ingredient__name', 'ingredient__measurement_unit'
         ).annotate(ingredient_amount=Sum('amount'))
-        shopping_list_text = generate_shopping_list(ingredients)
+
+        cart_recipes = Recipe.objects.filter(
+            shoppingcarts__user=request.user
+        )
+        shopping_list_text = generate_shopping_list(ingredients, cart_recipes)
         response = FileResponse(
             shopping_list_text,
             content_type='text/plain; charset=utf-8'
