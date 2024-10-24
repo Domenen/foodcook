@@ -49,8 +49,11 @@ class User(AbstractUser):
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
 
+    def get_full_name(self):
+        return f'{self.first_name} {self.last_name}'
+
     def __str__(self):
-        return f'{self.REQUIRED_FIELDS}'
+        return self.get_full_name()
 
 
 class Subscription(models.Model):
@@ -85,4 +88,3 @@ class Subscription(models.Model):
             raise ValidationError(
                 'Нельзя подписать пользователя на самого себя!'
             )
-        super().save()

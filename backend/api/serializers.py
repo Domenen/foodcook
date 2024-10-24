@@ -284,7 +284,10 @@ class FavoriteAndShoppingCartSerializer(serializers.ModelSerializer):
         model = self.Meta.model
 
         if model.objects.filter(user=user, recipe=recipe).exists():
-            raise ValidationError(f'Рецепт уже есть в {self.model_name}')
+            raise ValidationError(
+                f'Рецепт уже есть в {model._meta.verbose_name}'
+                f' ({self.model_name})'
+            )
         return data
 
     def to_representation(self, instance):
